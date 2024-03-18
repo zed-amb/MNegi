@@ -1,0 +1,24 @@
+@USER_ID=65f7ff22e9c7a1744e9ab41e
+@FILENAME=GUEST_PICTURE.png
+@FILE_FORM_NAME=myfile
+@FILE_MIME_TYPE=image/png
+@FILE_ID=5c7f3e3e3f3e3e3e3e3e3e3e
+###
+POST http://localhost:3000/students/{{USER_ID}}/files
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjVmN2ZmMjJlOWM3YTE3NDRlOWFiNDFlIiwiZW1haWwiOiJtZWtkaUBnbWFpbC5jb20iLCJpYXQiOjE3MTA3NTE4NDN9.BCHqmRvpaWQwF3zvepa2Ujm4j1To25i0WNEwpCLFE9Q
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="{{FILE_FORM_NAME}}"; filename="{{FILENAME}}"
+Content-Type: {{FILE_MIME_TYPE}}
+
+< ./{{FILENAME}}
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+###
+//GET http://localhost:3000/students/{{STUDENT_ID}}/files/{{FILE_ID}}
+
+###
+//GET http://localhost:3000/students/{{STUDENT_ID}}/files/{{FILE_ID}}?download=true
+
+###
+//DELETE http://localhost:3000/students/{{STUDENT_ID}}/files/{{FILE_ID}}

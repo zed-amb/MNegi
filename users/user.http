@@ -1,0 +1,33 @@
+@USER_ID=65f7ff22e9c7a1744e9ab41e
+# POST http://localhost:3000/users/signUp
+# Content-Type: application/json
+
+# {   
+
+#    "fullname": {"first":"mekdes","last":"negi"},
+#     "email": "mekdi@gmail.com",
+#     "password": "1234"
+
+# }
+
+# ### 
+
+
+#     POST http://localhost:3000/users/65f7ff22e9c7a1744e9ab41e/signIn
+#      Content-Type: application/json
+
+# {
+#     "email": "mekdi@gmail.com",
+#     "password":"1234"
+#     }
+
+    ###
+
+    POST http://localhost:3000/users/65f7ff22e9c7a1744e9ab41e/courses
+    Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjVmN2ZmMjJlOWM3YTE3NDRlOWFiNDFlIiwiZW1haWwiOiJtZWtkaUBnbWFpbC5jb20iLCJpYXQiOjE3MTA3NTU2NTV9.MgLMzwr_8agFBCcaLeaX_9_lJQzAdZLXnXoWqZarmw8
+    Content-Type: application/json
+
+    {
+        "title":"serverSide",
+        "description":"node.js"
+    }
