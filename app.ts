@@ -37,7 +37,6 @@ import { connectDB } from "./db_connect";
 import userRouter from "./users/users.router";
 import pictureRouter from "./picutres/pictures.router";
 import courseRouter from "./courses/courses.router"
-// import lectureRouter from "./courses/lectures/lectures.router"
 
 
 connectDB();
@@ -50,7 +49,7 @@ app.use(helmet());
 app.use('/users', userRouter);
 app.use('/pictures', pictureRouter);
 app.use('/courses', courseRouter); 
-// app.use('/lectures', lectureRouter);
+
 
 app.all('*', (req, res, next) => {
     next(new Error('No Route matched. Try again'));

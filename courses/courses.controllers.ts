@@ -5,18 +5,20 @@ import { Request, Response } from 'express';
 export const createCourse = async (req: Request, res: Response) => {
     try {
         const { title, description } = req.body;
-        const { _id, fullname, email } = req.body.tokenData;
-        
-        const created_by = { user_id: _id, fullname, email };
+        const { userId, fullname, email } = req.body.tokenData;
+        const created_by_fullname = typeof fullname === 'string' ? fullname : `${fullname.first} ${fullname.last}`;
+        const created_by = { user_id: userId, fullname: created_by_fullname, email };
+
         const courseData = { title, description, created_by, lectures: [] };
 
         const newCourse = await CourseModel.create(courseData);
         res.status(201).json(newCourse);
-    } catch (error) {
+    } catch (error: any) {
         console.error('Error creating course:', error);
-        res.status(500).json({ message: 'Internal server error' });
+        res.status(500).json({ message: 'Internal server error', error: error.message });
     }
 };
+
 
 export const getAllCourses = async (req: Request, res: Response) => {
     try {
@@ -35,7 +37,6 @@ export const getAllCourses = async (req: Request, res: Response) => {
     }
 };
 
-// Get courses owned by the user with pagination
 export const getOwnCourses = async (req: Request, res: Response) => {
     try {
         const userId = req.body.tokenData._id;
@@ -54,7 +55,6 @@ export const getOwnCourses = async (req: Request, res: Response) => {
     }
 };
 
-// Get a specific course by course id
 export const getCourseById = async (req: Request, res: Response) => {
     try {
         const courseId = req.params.course_id;
@@ -71,11 +71,11 @@ export const getCourseById = async (req: Request, res: Response) => {
     }
 };
 
-// Delete a course by course id
+
 export const deleteCourse = async (req: Request, res: Response) => {
     try {
         const courseId = req.params.course_id;
-        const userId = req.body.tokenData?._id; // I Used optional chaining to access _id
+        const userId = req.body.tokenData?._id; 
 
         const course = await CourseModel.findById(courseId).exec();
 
@@ -120,40 +120,83 @@ export const updateCourse = async (req: Request, res: Response) => {
     }
 };
 
+export const addLectureToCourse = async (req: Request, res: Response) => {
+    try {
+        const courseId = req.params.course_id;
+        const userId = req.body.tokenData?._id;
+        const course = await CourseModel.findOne({ _id: courseId, 'created_by.user_id': userId }).exec();
+        if (!course) {
+            return res.status(403).json({ message: 'Unauthorized to add lecture to this course' });
+        }
 
+        const { title, description, url } = req.body;
+        const newLecture = {
+            title,
+            description,
+            url
+        };
 
+        course.lectures.push(newLecture);
+        await course.save();
+        const lectureUrls = course.lectures.map((lecture: any) => lecture.url);
 
+        res.status(201).json({
+            ...course.toJSON(),
+            lectures: lectureUrls
+        });
+    } catch (error) {
+        console.error('Error adding lecture to course:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+};
 
+export const getAllLecturesOfCourse = async (req: Request, res: Response) => {
+    try {
+        const courseId = req.params.course_id;
 
+        const course = await CourseModel.findById(courseId).exec();
+        if (!course) {
+            return res.status(404).json({ message: 'Course not found' });
+        }
 
+        res.json(course.lectures);
+    } catch (error) {
+        console.error('Error fetching lectures of course:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+};
 
+export const updateLecture = async (req: Request, res: Response) => {
+    try {
+        const courseId = req.params.course_id;
+        const lectureId = req.params.lecture_id;
+        const userId = req.body.tokenData?._id;
 
+        const course = await CourseModel.findOne({ _id: courseId, 'created_by.user_id': userId }).exec();
+        if (!course) {
+            return res.status(403).json({ message: 'Unauthorized to update lecture in this course' });
+        }
 
+        const lecture = course.lectures.id(lectureId);
+        if (!lecture) {
+            return res.status(404).json({ message: 'Lecture not found' });
+        }
 
+        if (req.body.title) {
+            lecture.title = req.body.title;
+        }
+        if (req.body.description) {
+            lecture.description = req.body.description;
+        }
+        if (req.body.url) {
+            lecture.url = req.body.url;
+        }
 
+        await course.save();
 
-
-
-
-
-// import { RequestHandler } from "express";
-// import { Course, CourseModel } from "./courses.model";
-// import { StandardResponse } from "../types/response";
-
-// export const post_course: RequestHandler<unknown, StandardResponse<Course>, Course, unknown> = async (req, res, next) => {
-//     try {
-//         const { title, description } = req.body;
-//         const { userInfo } = req;
-//         console.log(userInfo);
-//         if (userInfo) {
-
-//             const result = await CourseModel.create({ title, description, created_by: userInfo._id });
-//             res.json({ success: true, data: result });
-//         }
-//     }
-//     catch (error) {
-//         next(error);
-//     }
-// };
-
-
+        res.json(course);
+    } catch (error) {
+        console.error('Error updating lecture:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+};
